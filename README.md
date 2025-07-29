@@ -1,21 +1,25 @@
-# Categorical Embedding Optimization with Cross-Validated Objectives
+# Categorical FeaturesEmbedding 
 
 ## 📌 Motivation
 
-Traditional one-hot encoding for categorical variables introduces fixed geometry (orthogonality), which is often suboptimal.  
-This project learns **low-dimensional embeddings** for categorical features using cross-validation to optimize geometric objectives (e.g., maximum inter-class centroid distance).
+One-hot encoding for categorical variables is a widely used technique, especially valued for its ability to eliminate encoding bias. However, representing categories with binary vectors such as `[1 0]`, `[0 1]`, etc., introduces **fixed orthogonal geometry** into the feature space. This rigid structure may not align well with the underlying data distribution and could limit the model's ability to find optimal decision boundaries.
 
+This project proposes a method to learn **low-dimensional, trainable embeddings** for categorical variables by optimizing a geometric criterion—specifically, the **maximum inter-class centroid distance**—using cross-validation. The approach provides a more flexible geometric representation that better reflects the separability of the target classes.
+
+🔬 _Note: This work currently focuses on classification tasks only. Its effectiveness for downstream classifiers is yet to be fully evaluated._
 ## 📊 Dataset Preparation
 
 The Iris dataset is used as a base, and a categorical feature is artificially created by binning a numeric column:
 
 ```python
-from sklearn.datasets import load_iris
-...
-bin_column = np.digitize(X[:, 0], bins=[5.0, 6.0])
+# Bin petal width into low, medium, high
+from sklearn.preprocessing import KBinsDiscretizer
+binner = KBinsDiscretizer(n_bins=3, encode='ordinal', strategy='quantile')
+X['petal_width_bin'] = binner.fit_transform(X[['petal width (cm)']]).astype(int)
 ```
 
-This simulates a 3-class categorical column for embedding experiments.
+This simulates a 3-class categorical column for embedding experiments. 
+Objective is still to build a classification model for predicting species but instead of using a numeric col we use the binned feature.
 
 ## ⚙️ Core Functions (from `cat_embeddings.py`)
 
